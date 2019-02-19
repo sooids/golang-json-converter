@@ -97,7 +97,7 @@ class JsonToGo:
         for key in scope.keys():
             keyname = key
             self.indent(self._tabs)
-            self.append(format(keyname)+" ")
+            self.append(self.format(keyname)+" ")
             self.parseScope(scope[keyname])
 
             self.append(' `json:"' + keyname)
@@ -167,3 +167,8 @@ class JsonToGo:
         self.append("type "+typename+" ")
         self.parseScope(scope)
         return self._go
+
+if __name__ == "__main__":
+    with open("/Users/soo/go/src/github.com/soo/golang-json-converter/example.json") as f:
+        data = f.read()
+        print(JsonToGo().Convert(data))
