@@ -1,3 +1,12 @@
+#!/usr/bin/env python
+# Python 3.7.4
+
+# Python Version of JSON-to-Go by Matt Holt
+# https://github.com/mholt/json-to-go
+# A simple utility to translate JSON into a Go type definition.
+# Ported by sooids
+# https://github.com/sooids
+
 import json
 import re
 
@@ -25,6 +34,7 @@ class JsonToGo:
     def append(self, data):
         self._go += data
     
+    # Proper cases a string according to Go conventions
     def toProperCase(self, data):
         f = lambda frag: frag.group().upper().replace("_", "") if frag.group().upper() in CommonInitialisms else frag.group().title().replace("_", "")
         p = re.compile(r"(^|[^a-zA-Z])([a-z]+)")
@@ -59,6 +69,8 @@ class JsonToGo:
                         
                         allFields[keyname]["count"] += 1
                 
+                # create a common struct with all fields found in the current array
+				# omitempty dict indicates if a field is optional
                 keys = allFields.keys()
                 struct = {}
                 omitempty = {}
@@ -68,7 +80,7 @@ class JsonToGo:
                     elem = allFields[keyname]
                     struct[keyname] = elem["value"]
                     omitempty[keyname] = elem["count"] != len(scope)
-                self.parseStruct(struct, omitempty)
+                self.parseStruct(struct, omitempty) # finally parse the struct !!
             elif sliceType == "slice":
                 self.parseScope(scope[0])
             else:
@@ -96,6 +108,7 @@ class JsonToGo:
         self.indent(self._tabs)
         self.append("}")
 
+    # Sanitizes and formats a string to make an appropriate identifier in Go
     def format(self, data):
         if not data:
             return ""
@@ -108,6 +121,7 @@ class JsonToGo:
             return "NAMING_FAILED"
         return res
 
+    # Determines the most appropriate Go type
     def goType(self, val):
         if val == None:
             return "interface{}"
@@ -133,6 +147,7 @@ class JsonToGo:
         else:
             return "interface{}"
 
+    # Given two types, returns the more specific of the two
     def mostSpecificPossibleGoType(self, typ1, typ2):
         if "float" in typ1 and "int" in typ2:
             return typ1
