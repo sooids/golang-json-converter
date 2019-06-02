@@ -169,6 +169,6 @@ class JsonToGo:
         return self._go
 
 if __name__ == "__main__":
-    with open("/Users/soo/go/src/github.com/soo/golang-json-converter/example.json") as f:
+    with open("example.json") as f:
         data = f.read()
         print(JsonToGo().Convert(data))
